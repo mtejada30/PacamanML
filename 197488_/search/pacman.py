@@ -212,6 +212,8 @@ class GameState:
     def isWin( self ):
         return self.data._win
 
+    def hasNumberGame(self):
+        return self.data._numberGame
     #############################################
     #             Helper methods:               #
     # You shouldn't need to call these directly #
@@ -279,6 +281,7 @@ class ClassicGameRules:
         game.state = initState
         self.initialState = initState.deepCopy()
         self.quiet = quiet
+
         return game
 
     def process(self, state, game):
@@ -369,6 +372,7 @@ class PacmanRules:
             if numFood == 0 and not state.data._lose:
                 state.data.scoreChange += 500
                 state.data._win = True
+                state.data._numberGame += 1
         # Eat capsule
         if( position in state.getCapsules() ):
             state.data.capsules.remove( position )
@@ -634,6 +638,10 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
     games = []
 
     for i in range( numGames ):
+        with open("games.txt", 'w') as f:
+            f.write(str(i))
+            f.write("\n")
+
         beQuiet = i < numTraining
         if beQuiet:
                 # Suppress output and graphics
@@ -643,8 +651,10 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
         else:
             gameDisplay = display
             rules.quiet = False
+
         game = rules.newGame( layout, pacman, ghosts, gameDisplay, beQuiet, catchExceptions)
         game.run()
+
         if not beQuiet: games.append(game)
 
         if record:

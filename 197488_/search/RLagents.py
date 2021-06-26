@@ -30,6 +30,7 @@ class RLagents(Agent):
         self.gamma = 0.9
         self.alpha = 0.1
         self.nextPos = [0,0]
+
         self.numberJogos = 0
 
         self.initTableQ()
@@ -65,32 +66,29 @@ class RLagents(Agent):
 
     def getAction(self, state):
         self.currentPos = state.getPacmanPosition()
-
         currentState = self.getState(self.currentPos)
         currentAction = self.chooseAction()
 
-        self.reward = 0
         actionTrue = self.getAction_()
+        pos = self.setAction(self.currentPos)
+
+        self.reward = state.getFood()[pos[0]][pos[1]]*20
         legalAction = False
         if actionTrue in state.getLegalPacmanActions():
             legalAction = True
         else:
             self.reward -= 50
             actionTrue = Directions.STOP
-        self.reward += state.getScore()
+        #self.reward += state.getScore()
 
         self.updateQtable(legalAction)
 
-        """
-        if self.numberJogos != numberJogos:
-            self.epsilon -= 0.08
-            self.numberJogos = numberJogos
-            print("Jogos jugados: ", self.numberJogos)
-        """
-        self.epsilon -= 0.0008
-        self.saveTableQ()
-        return actionTrue
+        if state.getScore() == 0.0:
+            self.numberJogos += 1
+            self.saveTableQ()
+            self.epsilon -= 0.001
 
+        return actionTrue
 
     def updateQtable(self, legalAction):
         qactual = self.table_[self.qstate, self.action]
@@ -101,7 +99,6 @@ class RLagents(Agent):
         qnext = np.max(self.table_[nexState])
         newValueQ = qactual + self.alpha*(self.reward + self.gamma*qnext - qactual)
         self.table_[self.qstate, self.action] = newValueQ
-
 
     def setAction(self, pos):
         if self.action == 0:
@@ -137,9 +134,6 @@ class RLagents(Agent):
             states = self.table_[self.qstate]
             self.action = np.argmax(states)
         return self.action
-
-
-
 
 
 """

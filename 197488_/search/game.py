@@ -29,6 +29,7 @@ import sys
 # Parts worth reading #
 #######################
 
+GAMES = 1
 
 class Agent:
     """
@@ -389,6 +390,8 @@ class GameStateData:
         self._foodAdded = None
         self._capsuleEaten = None
         self._agentMoved = None
+        global GAMES
+        self._numberGame = GAMES
         self._lose = False
         self._win = False
         self.scoreChange = 0
