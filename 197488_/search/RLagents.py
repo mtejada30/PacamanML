@@ -35,6 +35,32 @@ class RLagents(Agent):
 
         self.initTableQ()
 
+    def getAction(self, state):
+        self.currentPos = state.getPacmanPosition()
+        currentState = self.getState(self.currentPos)
+        currentAction = self.chooseAction()
+
+        actionTrue = self.getAction_()
+        pos = self.setAction(self.currentPos)
+
+        self.reward = state.getFood()[pos[0]][pos[1]]*20
+        legalAction = False
+        if actionTrue in state.getLegalPacmanActions():
+            legalAction = True
+        else:
+            self.reward -= 50
+            actionTrue = Directions.STOP
+        #self.reward += state.getScore()
+
+        self.updateQtable(legalAction)
+
+        if state.getScore() == 0.0:
+            self.numberJogos += 1
+            self.saveTableQ()
+            self.epsilon -= 0.001
+
+        return actionTrue
+
     def initTableQ(self):
         # STATES (Posições do tablero) X ACTIONS (STOP, EAST, SOUTH, WEST, NORTH)
         if(self.index == 0):
@@ -63,32 +89,6 @@ class RLagents(Agent):
                 for j in range(cols):
                     f.write(str(self.table_[i,j]) + "\t")
                 f.write("\n")
-
-    def getAction(self, state):
-        self.currentPos = state.getPacmanPosition()
-        currentState = self.getState(self.currentPos)
-        currentAction = self.chooseAction()
-
-        actionTrue = self.getAction_()
-        pos = self.setAction(self.currentPos)
-
-        self.reward = state.getFood()[pos[0]][pos[1]]*20
-        legalAction = False
-        if actionTrue in state.getLegalPacmanActions():
-            legalAction = True
-        else:
-            self.reward -= 50
-            actionTrue = Directions.STOP
-        #self.reward += state.getScore()
-
-        self.updateQtable(legalAction)
-
-        if state.getScore() == 0.0:
-            self.numberJogos += 1
-            self.saveTableQ()
-            self.epsilon -= 0.001
-
-        return actionTrue
 
     def updateQtable(self, legalAction):
         qactual = self.table_[self.qstate, self.action]
