@@ -372,7 +372,7 @@ class PacmanRules:
             if numFood == 0 and not state.data._lose:
                 state.data.scoreChange += 500
                 state.data._win = True
-                state.data._numberGame += 1
+                
         # Eat capsule
         if( position in state.getCapsules() ):
             state.data.capsules.remove( position )
